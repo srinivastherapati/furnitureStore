@@ -24,7 +24,7 @@ const modalStyle = {
   p: 4,
 };
 
-export default function AddProductModal({ open, onClose, currentProduct, isAdd }) {
+export default function AddMealModal({ open, onClose, currentProduct, isAdd }) {
     const [category,setCategory] = useState("");
   const [name, setName] = useState(currentProduct?.name || "");
   const [imageUrl, setImageUrl] = useState(currentProduct?.imageUrl || "");

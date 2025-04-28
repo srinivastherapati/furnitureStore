@@ -8,6 +8,7 @@ import CustomerOrders from "./Components/CustomerOrders";
 import AllOrders from "./Components/AllOrders";
 import AllUsers from "./Components/AllUsers";
 import { CartContextProvider } from "./Components/Store/CartContext";
+import ManageManagers from "./Components/ManageManagers";
 import { UserProgressContextProvider } from "./Components/Store/UserProgressContext";
 
 function App() {
@@ -53,20 +54,24 @@ function App() {
             <div style={{ width: "100%" }}>
               <Header
                 isLoggedIn={loggedIn}
-                isAdmin={userData ? userData.role === "admin" : false}
+                role={userData?.role}
                 userData={userData}
                 onLogout={handleLogout}
                 setCurrentPage={setCurrentPage}
               />
               {currentPage == "products" && (
                 <Meals
-                  isAdmin={userData ? userData.role === "admin" : null}
+                  role={ userData?.role }
                   isLoggedIn={loggedIn}
                   setCurrentPage={setCurrentPage}
                 />
               )}
               {userData &&
-                userData.role != "admin" &&
+              userData.role==="admin" &&
+              currentPage === "manage-managers" && <ManageManagers />}
+
+              {userData &&
+                userData.role === "customer" &&
                 currentPage == "your-orders" && <CustomerOrders />}
               {userData &&
                 userData.role === "admin" &&
