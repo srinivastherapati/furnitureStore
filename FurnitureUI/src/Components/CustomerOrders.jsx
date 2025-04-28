@@ -31,7 +31,7 @@ const CustomerOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [ratings, setRatings] = useState({});
   const [comments, setComments] = useState({});
-  
+
   const userData = JSON.parse(localStorage.getItem("userDetails"));
 
   useEffect(() => {
@@ -74,8 +74,10 @@ const CustomerOrders = () => {
       comment: comments[product.productId] || "",
     }));
 
+    const payload = { reviews };
+
     try {
-      const response = await submitProductReview(reviews);
+      const response = await submitProductReview(payload);
       if (response.ok) {
         alert("Reviews submitted successfully!");
         handleCloseOrderItems();
@@ -84,6 +86,7 @@ const CustomerOrders = () => {
       }
     } catch (error) {
       console.error("Error submitting reviews:", error);
+      alert("An error occurred while submitting reviews.");
     }
   };
 
@@ -149,7 +152,7 @@ const CustomerOrders = () => {
 
       {/* Order Items Dialog with Ratings & Comments */}
       {selectedOrder && (
-        <Dialog open={Boolean(selectedOrder)} onClose={handleCloseOrderItems}>
+        <Dialog open={Boolean(selectedOrder)} onClose={handleCloseOrderItems} fullWidth maxWidth="md">
           <DialogTitle>Order Items</DialogTitle>
           <DialogContent>
             <Table size="small">
@@ -173,13 +176,14 @@ const CustomerOrders = () => {
                           setRatings({ ...ratings, [product.productId]: e.target.value })
                         }
                         displayEmpty
+                        fullWidth
                       >
                         <MenuItem value="">Select</MenuItem>
-                        <MenuItem value={1}>1</MenuItem>
-                        <MenuItem value={2}>2</MenuItem>
-                        <MenuItem value={3}>3</MenuItem>
-                        <MenuItem value={4}>4</MenuItem>
-                        <MenuItem value={5}>5</MenuItem>
+                        {[1, 2, 3, 4, 5].map((num) => (
+                          <MenuItem key={num} value={num}>
+                            {num}
+                          </MenuItem>
+                        ))}
                       </Select>
                     </TableCell>
                     <TableCell>
@@ -190,6 +194,7 @@ const CustomerOrders = () => {
                         }
                         placeholder="Write a comment..."
                         fullWidth
+                        multiline
                       />
                     </TableCell>
                   </TableRow>
@@ -201,7 +206,7 @@ const CustomerOrders = () => {
             <Button onClick={handleCloseOrderItems} color="primary">
               Close
             </Button>
-            <Button onClick={handleCloseOrderItems} oncolor="secondary" variant="contained">
+            <Button onClick={handleSubmitReview} color="secondary" variant="contained">
               Submit Reviews
             </Button>
           </DialogActions>

@@ -47,12 +47,12 @@ public class CustomerController {
         if(customerService.isUserExist(customers.getEmail())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("customer already registered with email "+customers.getEmail());
         }
-        customers.setRole("customer");
         String encryptedPassword = passwordEncoder.encode(customers.getPassword());
         customers.setPassword(encryptedPassword);
         customersRepo.save(customers);
         return ResponseEntity.status(HttpStatus.CREATED).body("customer registered successfully");
     }
+
 
     @PostMapping("/login")
     public  ResponseEntity<?> userLogin(@RequestBody Customer customer){
@@ -76,13 +76,16 @@ public class CustomerController {
             if (!passwordEncoder.matches(password, existingCustomer.getPassword())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email password mismatch");
             }
+            if(existingCustomer.getRole().equalsIgnoreCase("manager") && !existingCustomer.isApproved()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("can't login, approval pending from admin");
+            }
             // Return customer details
             System.out.println(existingCustomer.getFirstName());
             System.out.println(existingCustomer.getId());
             Map<String, String> customerDetails = new HashMap<>();
             customerDetails.put("emailId", existingCustomer.getEmail());
             customerDetails.put("userName", existingCustomer.getFirstName());
-            customerDetails.put("role", "customer");
+            customerDetails.put("role", existingCustomer.getRole());
             customerDetails.put("userId",existingCustomer.getId());
             return ResponseEntity.ok(customerDetails);
         }
@@ -90,9 +93,11 @@ public class CustomerController {
     }
     @GetMapping("/get")
     public ResponseEntity<?> getAllCustomers() {
-        List<Customer> customers = customersRepo.findAll().stream()
-                .filter(customer -> !"admin".equalsIgnoreCase(customer.getFirstName()))
-                .toList();;
+//        List<Customer> customers = customersRepo.findAll().stream()
+//                .filter(customer -> !"admin".equalsIgnoreCase(customer.getFirstName()))
+//                .toList();;
+
+        List<Customer> customers=customersRepo.findByRole("customer");
         if (customers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.EMPTY_LIST);
         }
@@ -124,6 +129,26 @@ public class CustomerController {
         }).toList();
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get/managers")
+    public ResponseEntity<?> getAllManagers(){
+        List<Customer> managers=customersRepo.findByRole("manager");
+        if (managers.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("no managers found");
+        }
+        return ResponseEntity.ok(managers);
+    }
+
+    @PostMapping("/approve/manager/{id}")
+    public  ResponseEntity<String> approveManagers(@PathVariable String id){
+        Optional<Customer> manager=customersRepo.findById(id);
+        if(manager.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("manager not found");
+        }
+        manager.get().setApproved(!manager.get().isApproved());
+        customersRepo.save(manager.get());
+        return ResponseEntity.status(HttpStatus.CREATED).body(manager.get().isApproved()?"Approved":"Rejected");
     }
 
 

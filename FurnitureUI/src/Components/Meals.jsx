@@ -22,7 +22,7 @@ import { API_BASE_URL } from "./ServerRequests.jsx";
 
 const requestConfig = {};
 
-export default function Meals({ isAdmin, isLoggedIn, setCurrentPage }) {
+export default function Meals({ role, isLoggedIn, setCurrentPage }) {
   const [isAdd, setIsAdd] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -147,7 +147,7 @@ useEffect(() => {
 
 
       {/* Add Product Button */}
-      {isAdmin && (
+      {role==="admin" && (
         <Button
           variant="contained"
           sx={{ position: "fixed", bottom: 20, right: 20 }}
@@ -161,7 +161,7 @@ useEffect(() => {
       <Grid container spacing={2}>
         {displayedProducts.map((product) => (
           <Grid item xs={12} sm={6} md={4} key={product.id}>
-            <MealItem setCurrentPage={setCurrentPage} isLoggedIn={isLoggedIn} isAdmin={isAdmin} product={product} />
+            <MealItem setCurrentPage={setCurrentPage} isLoggedIn={isLoggedIn} role={role} product={product} />
           </Grid>
         ))}
       </Grid>

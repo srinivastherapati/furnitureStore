@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Paper } from "@mui/material";
+import { TextField, Button, Box, Typography, Paper,MenuItem } from "@mui/material";
 import { registerUser, loginUser } from "./ServerRequests";
 
 function LoginPage({ setLoggedIn, setUserData }) {
@@ -14,6 +14,7 @@ function LoginPage({ setLoggedIn, setUserData }) {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [zip, setZip] = useState("");
+  const [role, setRole] = useState("customer");
   const [dateOfBirth, setDateOfBirth] = useState("");
 
   const togglePage = () => {
@@ -24,6 +25,10 @@ function LoginPage({ setLoggedIn, setUserData }) {
     e.preventDefault();
     try {
       const userData = await loginUser({ email, password });
+      if (userData.role === "manager" && userData.isApproved === false) {
+        alert("Approval pending from admin. You cannot login yet.");
+        return; 
+      }
       localStorage.setItem("loggedIn", "true");
       localStorage.setItem("userDetails", JSON.stringify(userData));
       setUserData(userData);
@@ -61,11 +66,17 @@ function LoginPage({ setLoggedIn, setUserData }) {
         email,
         password,
         phoneNumber,
+        role,
         dateOfBirth,
         address: [`${street}, ${city}, ${state}, ${zip}`],
       };
       await registerUser(newUser);
-      alert("Signup successful! Please log in.");
+      if(role === "customer") {
+      alert("Signup successful! Please log in.")
+      }
+      else{
+        alert("Signup successful! Waiting for admin approval.");
+      }
       setIsLogin(true);
     } catch (error) {
       console.error("Signup Error:", error.response?.data || error.message);
@@ -159,6 +170,18 @@ function LoginPage({ setLoggedIn, setUserData }) {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
+               <TextField
+                select
+                label="Sign Up As"
+                fullWidth
+                margin="normal"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                required
+              >
+                <MenuItem value="customer">Customer</MenuItem>
+                <MenuItem value="manager">Manager</MenuItem>
+              </TextField>
               <TextField
                 label="Date of Birth"
                 type="date"

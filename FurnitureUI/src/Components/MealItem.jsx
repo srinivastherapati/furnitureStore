@@ -8,7 +8,7 @@ import { deleteProduct } from "./ServerRequests";
 
 export default function MealItem({
   product,
-  isAdmin,
+  role,
   onEdit,
   isLoggedIn,
   setCurrentPage,
@@ -87,7 +87,7 @@ export default function MealItem({
             )}
 
             {/* Admin Controls */}
-            {isAdmin && (
+            {role!="customer" && (
               <>
                 <p className="total-stock">
                   <strong>Total Stock:</strong>{" "}
@@ -106,7 +106,7 @@ export default function MealItem({
             )}
 
             {/* Add to Cart Button */}
-            {!isAdmin && (
+            {role==="customer" && (
               <Buttons onClick={handleAddMeal}>
                 {selectedVariant?.stock <= 0 ? "Out of Stock" : "+ Add to Cart"}
               </Buttons>
