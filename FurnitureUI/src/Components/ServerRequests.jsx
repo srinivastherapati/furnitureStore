@@ -43,19 +43,16 @@ export const getCustomerOrders = async (id) => {
 
 export const submitProductReview = async (reviews) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/review/add`,
-      reviews,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    return await response.data;
+    const response = await axios.post(`${API_BASE_URL}/review/add`, reviews, {
+      headers: { "Content-Type": "application/json" },
+    });
+    return response;
   } catch (e) {
     console.error(e);
+    throw e;
   }
-}
+};
+
   
 
 

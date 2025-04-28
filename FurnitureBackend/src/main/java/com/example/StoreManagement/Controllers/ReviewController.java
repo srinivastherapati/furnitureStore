@@ -7,6 +7,7 @@ import com.example.StoreManagement.Repositories.ReviewsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,17 +23,8 @@ public class ReviewController {
     @Autowired
     private ProductsRepo productsRepo;
     @PostMapping("/add")
-    public ResponseEntity<?> addReviews(@RequestBody Map<String, Object> payload) {
-        List<Map<String, Object>> reviews = (List<Map<String, Object>>) payload.get("reviews");
-
-        for (Map<String, Object> reviewData : reviews) {
-            Reviews review = new Reviews();
-            review.setProductId((String) reviewData.get("productId"));
-            review.setRating((int) reviewData.get("rating"));
-            review.setComment((String) reviewData.get("comment"));
-            reviewRepo.save(review);
-        }
-
+    public ResponseEntity<?> addReviews(@RequestBody  List<Reviews> reviews) {
+            reviewRepo.saveAll(reviews);
         return ResponseEntity.ok("Reviews added successfully!");
     }
 
