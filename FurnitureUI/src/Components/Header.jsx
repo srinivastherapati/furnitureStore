@@ -9,7 +9,7 @@ import CartContext from "./Store/CartContext.jsx";
 import UserProgressContext from "./Store/UserProgressContext.jsx";
 import "./Header.css";
 
-export default function Header({ isAdmin, isLoggedIn, userData, onLogout, setCurrentPage }) {
+export default function Header({ role, isLoggedIn, userData, onLogout, setCurrentPage }) {
   const crtCntxt = useContext(CartContext);
   const userProgressCtx = useContext(UserProgressContext);
   const cartValue = crtCntxt.items.reduce((totalItems, item) => totalItems + item.quantity, 0);
@@ -57,14 +57,20 @@ export default function Header({ isAdmin, isLoggedIn, userData, onLogout, setCur
           onClose={handleClose}
           MenuListProps={{ 'aria-labelledby': 'basic-button' }}
         >
-          {isAdmin && <MenuItem onClick={() => { setCurrentPage("all-orders"); handleClose(); }}>Orders</MenuItem>}
-          {isAdmin && <MenuItem onClick={() => { setCurrentPage("all-users"); handleClose(); }}>Users</MenuItem>}
-          {isLoggedIn && !isAdmin && <MenuItem onClick={() => { setCurrentPage("your-orders"); handleClose(); }}>Your Orders</MenuItem>}
-          {!isAdmin && (
+          {role==="admin" && <MenuItem onClick={() => { setCurrentPage("all-orders"); handleClose(); }}>Orders</MenuItem>}
+          {role==="admin" && <MenuItem onClick={() => { setCurrentPage("all-users"); handleClose(); }}>Users</MenuItem>}
+          {isLoggedIn && role==="customer" && <MenuItem onClick={() => { setCurrentPage("your-orders"); handleClose(); }}>Your Orders</MenuItem>}
+          {role==="customer" && (
             <MenuItem onClick={() => { handleShowCart(); handleClose(); }}>
               Cart ({cartValue}) <ShoppingCartIcon sx={{ marginLeft: "8px" }} />
             </MenuItem>
           )}
+          {role==="admin" && (
+  <MenuItem onClick={() => { setCurrentPage("manage-managers"); handleClose(); }}>
+    Manage Managers
+  </MenuItem>
+)}
+
           {!isLoggedIn ? (
             <MenuItem onClick={() => { setCurrentPage("login"); handleClose(); }}>Login</MenuItem>
           ) : (

@@ -11,15 +11,26 @@ export default function Review({ mealId, onClose }) {
       setFeedback("Please select a rating.");
       return;
     }
+  
+    const payload = {
+      reviews: [
+        {
+          productId: mealId,
+          rating: rating,
+          comment: comment,
+        },
+      ],
+    };
+  
     try {
-      const response = await fetch(`http://localhost:3000/reviews`, {
+      const response = await fetch(`http://localhost:8080/reviews/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ mealId, rating, comment }),
+        body: JSON.stringify(payload),
       });
-
+  
       if (response.ok) {
         setFeedback("Review submitted successfully!");
         setRating(0);
@@ -33,6 +44,7 @@ export default function Review({ mealId, onClose }) {
       setFeedback("Error submitting review.");
     }
   }
+  
 
   return (
     <div className="review-modal-backdrop" onClick={onClose}>
