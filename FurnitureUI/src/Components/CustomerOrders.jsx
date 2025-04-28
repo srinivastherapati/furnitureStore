@@ -86,7 +86,7 @@ const CustomerOrders = () => {
         alert("Reviews submitted successfully!");
         handleCloseOrderItems();
       } catch (error) {
-        console.error("Error submitting reviews:", error);
+        console.error("Error submitting the reviews:", error);
         alert("Failed to submit reviews");
       }
     };
